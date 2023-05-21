@@ -42,8 +42,34 @@ function Worldcup() {
   const [nextGame, setNextGame] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showSelectedItem, setShowSelectedItem] = useState(false);
+  const [stat, setStat] = useState({
+    "카리나 1번": 0,
+    "카리나 2번": 0,
+    "카리나 3번": 0,
+    "카리나 4번": 0,
+    "카리나 5번": 0,
+    "카리나 6번": 0,
+    "카리나 7번": 0,
+    "카리나 8번": 0,
+    "카리나 9번": 0,
+    "카리나 10번": 0,
+    "카리나 11번": 0,
+    "카리나 12번": 0,
+    "카리나 13번": 0,
+    "카리나 14번": 0,
+    "카리나 15번": 0,
+    "카리나 16번": 0,
+  }); // 통계정보 저장
+  const left = round * 2,
+    right = round * 2 + 1;
 
   useEffect(() => {
+    const localStorageKey = "2017112191"; // 원하는 키로 변경하세요
+    const storedStat = localStorage.getItem(localStorageKey);
+    if (storedStat !== null) {
+      setStat(JSON.parse(storedStat));
+    }
+
     setGame(
       candidate
         .map((c) => {
@@ -77,21 +103,48 @@ function Worldcup() {
 
   const handleItemClick = (item) => {
     if (!selectedItem) {
+      setStat({ ...stat, [item.name]: stat[item.name] + 1 });
       setSelectedItem(item);
       setNextGame((prev) => prev.concat(item));
     }
   };
 
+
   if (game.length === 1) {
+    const localStorageKey = `2017112191`; // localStorage 에 저장하는 KEY 값은 본인의 학번으로 작성해주세요
+    localStorage.setItem(localStorageKey, JSON.stringify(stat)); // 문자열로 저장
+
     return (
-    <div className="wrapper">
-      <div className="img_container">
-        <div className="title">
-          <img className="winner_img" src={game[0].src} alt={game[0].name} />
-          <div className="description">{game[0].name} 이상형 월드컵 우승</div>
+      <div className="wrapper">
+        <div className="img_container">
+          <div className="title">
+            <img className="winner_img" src={game[0].src} alt={game[0].name} />
+            <div className="description">
+              {game[0].name} 이상형 월드컵 우승 {stat[game[0].name]} 번 승리
+            </div>
+          </div>
+  
+          <div className="chart_container">
+            <table>
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>승리 횟수</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(stat).map((name) => (
+                  <tr key={name}>
+                    <td>{name}</td>
+                    <td>{stat[name]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            
+          </div>
         </div>
       </div>
-    </div>
     );
   }
   if (game.length === 0 || round + 1 > game.length / 2)
@@ -107,12 +160,16 @@ function Worldcup() {
         <div className={`item ${showSelectedItem ? "center" : ""}`}>
           {showSelectedItem && (
             <>
-              <img className="selected_img" src={selectedItem.src} alt={selectedItem.name} />
+              <img
+                className="selected_img"
+                src={selectedItem.src}
+                alt={selectedItem.name}
+              />
               <div className="description">{selectedItem.name}</div>
             </>
           )}
         </div>
-        {game.slice(round * 2, round * 2 + 2).map((item, index) => (
+        {game.slice(left, right + 1).map((item, index) => (
           <div key={index} className={`item ${showSelectedItem ? "none" : ""}`}>
             <img
               className={`img ${selectedItem === item ? "selected" : ""}`}
